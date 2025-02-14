@@ -1,6 +1,7 @@
 from rest_framework import serializers
 from django.contrib.auth.hashers import make_password
 from .models import User
+from .utils import send_welcome_email
 from rest_framework_simplejwt.serializers import TokenObtainPairSerializer
 
 class CustomTokenObtainPairSerializer(TokenObtainPairSerializer):
@@ -19,7 +20,18 @@ class UserSerializer(serializers.ModelSerializer):
         extra_kwargs = {
             'password': {'write_only': True, 'required': False}  
         }
+    def create(self, validated_data):
+        password = validated_data.pop('password', None)
+        user = User.objects.create(**validated_data)
+        if password:
+            user.set_password(password)
+        user.save()
 
+        # Send a welcome email after creating the user
+        send_welcome_email(user.email, user.username)
+        print(user.email, user.username)
+
+        return user
     def update(self, instance, validated_data):
         password = validated_data.pop('password', None)  
         
