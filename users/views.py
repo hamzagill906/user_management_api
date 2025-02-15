@@ -84,16 +84,13 @@ class UpdateUserView(generics.UpdateAPIView):
         if not user:
             raise NotFound({"error": "User not found"})
 
-        # Ensure editors cannot change user roles
         if request.user.role == User.EDITOR and 'role' in request.data:
             raise PermissionDenied({"error": "Editor cannot change roles"})
 
-        # Make sure password is excluded from the request data if it's not provided
-        request_data = request.data.copy()  # Create a copy to modify
+        request_data = request.data.copy()  
         if 'password' not in request_data:
-            request_data.pop('password', None)  # Remove password from data if not included
+            request_data.pop('password', None)  
         
-        # Perform the update using the serializer
         serializer = self.get_serializer(user, data=request_data)
         serializer.is_valid(raise_exception=True)
 
