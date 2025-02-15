@@ -11,7 +11,7 @@ class User(AbstractUser):
         (EDITOR, 'Editor'),
         (VIEWER, 'Viewer'),
     ]
-
+    email = models.EmailField(unique=True)  
     profile_picture = models.ImageField(upload_to='profile_pics/', blank=True, null=True)
     role = models.CharField(max_length=10, choices=ROLE_CHOICES, default=VIEWER)
 
